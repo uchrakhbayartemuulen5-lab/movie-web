@@ -7,7 +7,7 @@ export const Header = () => {
     <div className="flex justify-between p-[30px] ">
       <div>
         <img
-          className="flex justify-center w-[92px] h-[20px]"
+          className="flex justify-center w-[90px] h-[20px]"
           src="Logo.png"
         ></img>
       </div>

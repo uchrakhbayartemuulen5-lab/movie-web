@@ -24,7 +24,7 @@ export const Blue = () => {
             </div>
           </div>
           <div className="flex flex-col">
-            <button className="text-white">Follow us</button>
+            <p className="text-white">Follow us</p>
             <p className="text-white underline ">
               Facebook Instagram Twitter Youtube
             </p>
