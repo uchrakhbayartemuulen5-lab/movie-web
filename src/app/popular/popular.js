@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { SeeMoreIcon } from "./seemoreicon";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { SeeMoreIcon } from "../_component/seemoreicon";
+
 const apilink =
-  "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
+  "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1";
 
 const options = {
   method: "GET",
@@ -13,22 +12,21 @@ const options = {
       "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NzZiMzEwNzJlZDg5ODcwMzQxM2Y0NzkyYzZjZTdjYyIsIm5iZiI6MTczODAyNjY5NS44NCwic3ViIjoiNjc5ODJlYzc3MDJmNDkyZjQ3OGY2OGUwIiwic2NvcGVzIjpbImFwaV9yZWFkIl0sInZlcnNpb24iOjF9.k4OF9yGrhA2gZ4VKCH7KLnNBB2LIf1Quo9c3lGF6toE",
   },
 };
-export const TopRated = () => {
-  const [topRatedData, setTopRatedData] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
+export const Popular = () => {
+  const [popularData, setPopularData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getData = async () => {
     setLoading(true);
     const data = await fetch(apilink, options);
     const jsonData = await data.json();
-    setTopRatedData(jsonData.results);
+    setPopularData(jsonData.results);
     setLoading(false);
   };
 
   console.log("loading", loading);
-  console.log("toprated", topRatedData);
+  console.log("popular", popularData);
 
   useEffect(() => {
     getData();
@@ -36,25 +34,18 @@ export const TopRated = () => {
   if (loading) {
     return <div>...loading</div>;
   }
-  const handleMovieClick = () => {
-    router.push("./movie-details/${movieID}");
-  };
-
   return (
     <div>
       <div className="flex justify-between mb-20 ">
-        <h1 className="mt-10 text-3xl">Toprated</h1>
-        <Link
-          href={"toprated"}
-          className="mt-10 text-1xl flex justify-center items-center "
-        >
+        <h1 className="mt-10 text-3xl">Popular</h1>
+        <h1 className="mt-10 text-1xl flex justify-center items-center ">
           See More
           <SeeMoreIcon />
-        </Link>
+        </h1>
       </div>
 
-      <div className="grid grid-cols-5 gap-15 mb-10" onClick={handleMovieClick}>
-        {topRatedData.slice(0, 10).map((movie, index) => {
+      <div className="grid grid-cols-5 gap-15 mb-10 ">
+        {popularData.map((movie, index) => {
           return (
             <div key={index}>
               <div>

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { SeeMoreIcon } from "./seemoreicon";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 const apilink =
   "https:api.themoviedb.org/3/movie/upcoming?language=en-US&page=1";
 
@@ -14,6 +16,8 @@ const options = {
 export const UpComing = () => {
   const [upComingData, setUpComingData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const getData = async () => {
     setLoading(true);
@@ -32,18 +36,27 @@ export const UpComing = () => {
   if (loading) {
     return <div>...loading</div>;
   }
+  const handleMovieClick = () => {
+    router.push("./movie-details/${movieID}");
+  };
 
   return (
     <div>
       <div className="flex justify-between mb-20 ">
         <h1 className="mt-10 text-3xl">Upcoming</h1>
-        <h1 className="mt-10 text-1xl flex justify-center items-center ">
+        <Link
+          href={"upcoming"}
+          className="mt-10 text-1xl flex justify-center items-center "
+        >
           See More
           <SeeMoreIcon />
-        </h1>
+        </Link>
       </div>
 
-      <div className="grid grid-cols-5 gap-15 mb-10 ">
+      <div
+        className="grid grid-cols-5 gap-15 mb-10 "
+        onClick={handleMovieClick}
+      >
         {upComingData.slice(0, 10).map((movie, index) => {
           return (
             <div key={index}>

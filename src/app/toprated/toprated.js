@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { SeeMoreIcon } from "./seemoreicon";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { SeeMoreIcon } from "../_component/seemoreicon";
 const apilink =
-  "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
-
+  "https:api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
 const options = {
   method: "GET",
   headers: {
@@ -17,8 +14,6 @@ export const TopRated = () => {
   const [topRatedData, setTopRatedData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
   const getData = async () => {
     setLoading(true);
     const data = await fetch(apilink, options);
@@ -28,7 +23,7 @@ export const TopRated = () => {
   };
 
   console.log("loading", loading);
-  console.log("toprated", topRatedData);
+  console.log("topRated", topRatedData);
 
   useEffect(() => {
     getData();
@@ -36,25 +31,19 @@ export const TopRated = () => {
   if (loading) {
     return <div>...loading</div>;
   }
-  const handleMovieClick = () => {
-    router.push("./movie-details/${movieID}");
-  };
 
   return (
     <div>
       <div className="flex justify-between mb-20 ">
-        <h1 className="mt-10 text-3xl">Toprated</h1>
-        <Link
-          href={"toprated"}
-          className="mt-10 text-1xl flex justify-center items-center "
-        >
+        <h1 className="mt-10 text-3xl">TopRated</h1>
+        <button className="mt-10 text-1xl flex justify-center items-center ">
           See More
           <SeeMoreIcon />
-        </Link>
+        </button>
       </div>
 
-      <div className="grid grid-cols-5 gap-15 mb-10" onClick={handleMovieClick}>
-        {topRatedData.slice(0, 10).map((movie, index) => {
+      <div className="grid grid-cols-5 gap-15 mb-10 ">
+        {topRatedData.map((movie, index) => {
           return (
             <div key={index}>
               <div>
