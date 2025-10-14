@@ -1,10 +1,10 @@
 export const Blue = () => {
   return (
-    <div>
+    <div className="w-[1440px]">
       <button className=" bg-blue-500 w-full h-[230px] justify-center ">
         <div className="flex flex-row justify-around ">
           <div className=" flex flex-col items-start ">
-            <img className="w-[100px] h-[30px] " src="Logo (4).png" />
+            <img className="w-[100px] h-[30px] " src="/Logo (4).png" />
             <p className="text-white">© 2024 Movie Z. All Rights Reserved.</p>
           </div>
 

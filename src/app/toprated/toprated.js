@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { SeeMoreIcon } from "../_component/seemoreicon";
+import { SeeMoreIcon } from "../_component/icon/seemoreicon";
+import { RigthIcon } from "../_component/icon/rigthicon";
+import { Lefticon } from "../_component/icon/lefticon";
+import { useRouter } from "next/navigation";
 const apilink =
   "https:api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
 const options = {
@@ -13,6 +16,8 @@ const options = {
 export const TopRated = () => {
   const [topRatedData, setTopRatedData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const getData = async () => {
     setLoading(true);
@@ -28,6 +33,11 @@ export const TopRated = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  const handleMovieClick = (movieID) => {
+    router.push(`/movie-detail/${movieID}`);
+  };
+
   if (loading) {
     return <div>...loading</div>;
   }
@@ -36,20 +46,20 @@ export const TopRated = () => {
     <div>
       <div className="flex justify-between mb-20 ">
         <h1 className="mt-10 text-3xl">TopRated</h1>
-        <button className="mt-10 text-1xl flex justify-center items-center ">
-          See More
-          <SeeMoreIcon />
-        </button>
       </div>
 
       <div className="grid grid-cols-5 gap-15 mb-10 ">
-        {topRatedData.map((movie, index) => {
+        {topRatedData.map((movie) => {
           return (
-            <div key={index}>
+            <div
+              key={movie.id}
+              className="cursor-pointer"
+              onClick={() => handleMovieClick(movie.id)}
+            >
               <div>
                 <img
-                  className=" w-60 h-[300px] rounded-lg border "
-                  src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
+                  className=" w-[400px] h-[400px] rounded-lg border "
+                  src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
                 />
               </div>
               <div>
@@ -64,6 +74,32 @@ export const TopRated = () => {
             </div>
           );
         })}
+      </div>
+      <div className="flex justify-end">
+        <button className="w-[300px] h-[40px] flex justify-between items-center ">
+          <Lefticon />
+          <h1 className="opacity-55">previous</h1>
+          <h1 className="w-[20px] border flex justify-center items-center rounded-xl  h-[20px]">
+            1
+          </h1>
+          <h1 className="w-[20px] border flex justify-center items-center rounded-xl h-[20px]">
+            2
+          </h1>
+          <h1 className="w-[20px] border flex justify-center items-center rounded-xl h-[20px]">
+            3
+          </h1>
+          <h1 className="w-[20px] border flex justify-center items-center rounded-xl h-[20px]">
+            4
+          </h1>
+          <h1 className="w-[20px]  flex justify-center items-center h-[20px]">
+            ...
+          </h1>
+          <h1 className="w-[20px] border flex justify-center items-center rounded-xl h-[20px]">
+            5
+          </h1>
+          <h1 className="w-[20px]  h-[20px]"> next</h1>
+          <RigthIcon />
+        </button>
       </div>
     </div>
   );

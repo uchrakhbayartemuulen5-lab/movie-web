@@ -1,10 +1,8 @@
+"use client";
 import { useEffect, useState } from "react";
-import { RigthIcon } from "../_component/icon/rigthicon";
-import { Lefticon } from "../_component/icon/lefticon";
-import { useRouter } from "next/navigation";
-
-const apilink =
-  "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1";
+import { useParams, useRouter } from "next/navigation";
+import { Lefticon } from "@/app/_component/icon/lefticon";
+import { RigthIcon } from "@/app/_component/icon/rigthicon";
 
 const options = {
   method: "GET",
@@ -15,25 +13,29 @@ const options = {
   },
 };
 
-export const Popular = () => {
-  const [popularData, setPopularData] = useState([]);
+export const SeeMore = () => {
+  const { id } = useParams();
+  const apilink = `https://api.themoviedb.org/3/movie/${id}/similar?language=en-US&page=1`;
+
+  const [seeMore, setSeeMore] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
   const getData = async () => {
     setLoading(true);
-    const data = await fetch(apilink, options);
-    const jsonData = await data.json();
-    setPopularData(jsonData.results);
+    try {
+      const data = await fetch(apilink, options);
+      const jsonData = await data.json();
+      setSeeMore(jsonData.results);
+    } catch (err) {
+      console.error("Error fetching upseeMore movies:", err);
+    }
     setLoading(false);
   };
 
-  console.log("loading", loading);
-  console.log("popular", popularData);
-
   useEffect(() => {
-    getData();
+    getData(id);
   }, []);
 
   const handleMovieClick = (movieID) => {
@@ -43,38 +45,40 @@ export const Popular = () => {
   if (loading) {
     return <div>...loading</div>;
   }
+
   return (
     <div>
-      <div className="flex justify-between mb-20 ">
-        <h1 className="mt-10 text-3xl">Popular</h1>
+      <div className="flex justify-between mb-20">
+        <h1 className="mt-10 text-3xl">More like this</h1>
       </div>
 
-      <div className="grid grid-cols-5 gap-15 mb-10 ">
-        {popularData.map((movie) => {
-          return (
+      <div className="grid grid-cols-5 gap-10 mb-10">
+        {seeMore.map((movie) => (
+          <div
+            key={movie.id}
+            className="cursor-pointer"
+            onClick={() => handleMovieClick(movie.id)}
+          >
             <div>
-              <div
-                key={movie.id}
-                className="cursor-pointer"
-                onClick={() => handleMovieClick(movie.id)}
-              >
-                <img
-                  className=" w-[400px] h-[400px] rounded-lg border "
-                  src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-                />
-              </div>
-              <div>
-                <button className="border w-60 h-20 bg-gray-200 rounded-lg ">
-                  <div className="flex justify-start ">
-                    <img className="w-4 h-4" src="star (2).png" />
-                    <p className="text-l">6.9|10</p>
-                  </div>
-                  <p className="flex justify-start">{movie.title}</p>
-                </button>
-              </div>
+              <img
+                className="w-60 h-[400px] rounded-lg border"
+                src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+                alt={movie.title}
+              />
             </div>
-          );
-        })}
+            <div>
+              <button className="border w-60 h-20 bg-gray-200 rounded-lg mt-2">
+                <div className="flex justify-start items-center gap-1">
+                  <img className="w-4 h-4" src="/star (2).png" alt="star" />
+                  <p className="text-l">
+                    {movie.vote_average?.toFixed(1)} / 10
+                  </p>
+                </div>
+                <p className="text-left">{movie.title}</p>
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="flex justify-end">
         <button className="w-[300px] h-[40px] flex justify-between items-center ">

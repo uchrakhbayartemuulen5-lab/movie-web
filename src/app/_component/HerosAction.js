@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { RigthIcon } from "./rigthicon";
+import { useEffect, useState, useRef } from "react";
+import { RigthIcon } from "./icon/rigthicon";
 import { WatchIcon } from "./icon/watchicon";
-import { useRef } from "react";
+import { Lefticon } from "./icon/lefticon";
 import { useRouter } from "next/navigation";
 
 const apilink =
@@ -19,6 +19,7 @@ export const HerosAction = () => {
   const [herosActionData, setHerosActionData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentSlider, setCurrentSlider] = useState(0);
+  const [trailerKey, setTrailerKey] = useState(null);
   const sliderRef = useRef(null);
   const sliderWidth = 1440;
 
@@ -28,55 +29,95 @@ export const HerosAction = () => {
     setLoading(true);
     const data = await fetch(apilink, options);
     const jsonData = await data.json();
-    console.log("hahaha", jsonData);
-
     setHerosActionData(jsonData.results);
     setLoading(false);
   };
 
-  console.log("loading", loading);
-  console.log("herosAction", herosActionData);
+  const fetchTrailer = async (movieId) => {
+    try {
+      const trailerApi = `https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`;
+      const response = await fetch(trailerApi, options);
+      const data = await response.json();
+
+      const trailer = data.results.find(
+        (video) => video.type === "Trailer" && video.site === "YouTube"
+      );
+      if (trailer) {
+        setTrailerKey(trailer.key);
+      } else {
+        alert("Trailer олдсонгүй");
+      }
+    } catch (error) {
+      console.error("Trailer fetch алдаа:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (herosActionData.length <= 1) return;
+    const id = setInterval(() => {
+      setCurrentSlider((i) => (i = 1) % herosActionData);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [herosActionData]);
 
   useEffect(() => {
     getData();
   }, []);
+
+  const handleMovieClick = (movieID) => {
+    router.push(`/movie-detail/${movieID}`);
+  };
+
   if (loading) {
     return <div>...loading</div>;
   }
 
-  const handleNextBtn = () => {
+  const heroHandleNextBtn = () => {
     if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: sliderWidth, behaviour: "smooth" });
-      setCurrentSlider((prev = prev + 1));
+      sliderRef.current.scrollBy({
+        left: sliderWidth,
+        behavior: "smooth",
+      });
+      setCurrentSlider((prev) => prev + 1);
+    }
+  };
+  const handlePrevBtn = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: -sliderWidth,
+        behavior: "smooth",
+      });
+      setCurrentSlider((prev) => Math.max(prev - 1, 0));
     }
   };
 
-  const handleMovieClick = () => {
-    router.push("./movie-details/${movieID}");
-  };
-
   return (
-    <div className=" w-full " onClick={handleMovieClick}>
+    <div className="w-full">
       <div
-        className="w-[1440px] h-fit overflow-x-scroll scroll-smooth snap-x snap-mandatory"
         ref={sliderRef}
+        className="w-[1440px] h-fit overflow-x-hidden scroll-smooth snap-x snap-mandatory"
       >
         <div className="flex w-[1440px] ">
-          {herosActionData.map((movie, index) => {
+          {herosActionData.map((movie) => {
             return (
-              <div key={index}>
+              <div
+                key={movie.id}
+                className="cursor-pointer"
+                onClick={() => handleMovieClick(movie.id)}
+              >
                 <div className="relative w-[1440px] h-[600px]">
                   <img
-                    className=" w-[1440px] object-center h-full "
+                    className="w-[1440px] object-center h-full"
                     src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
+                    alt={movie.title}
                   />
-                  <div className="w-full h-full absolute top-0 left-0 z-10  flex flex-col justify-center gap-10 pl-10 pr-10 ">
+                  <div className="w-full h-full absolute top-0 left-0 z-10 flex flex-col justify-center gap-10 pl-10 pr-10 ">
                     <div>
                       <h1 className="text-white">Now playing</h1>
                       <h1 className="text-white text-4xl ">{movie.title}</h1>
                     </div>
                     <div className="flex">
-                      <img className="w-[28px] h-[28px] " src="star (1).png" />
+                      <img className="w-[28px] h-[28px]" src="star (1).png" />
                       <h1 className="text-white">6.9|10</h1>
                     </div>
                     <div>
@@ -85,26 +126,38 @@ export const HerosAction = () => {
                       </h1>
                     </div>
                     <div>
-                      <button className="w-[150px] h-[40px] text-black border bg-white rounded-lg flex items-center justify-center gap-2 ">
+                      <button
+                        className="w-[150px] h-[40px] text-black border bg-white rounded-lg flex items-center justify-center gap-2 "
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          fetchTrailer(movie.id);
+                        }}
+                      >
                         <WatchIcon />
                         Watch Trailer
                       </button>
                     </div>
                   </div>
-                  <div className="absolute top-0 left-0 z-10 flex justify-center items">
+                  <div className="absolute top-70 right-0 z-10">
                     <button
                       className="border w-8 h-8 rounded-4xl flex justify-center items-center bg-white cursor-pointer"
-                      onClick={handleNextBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        heroHandleNextBtn();
+                      }}
                     >
                       <RigthIcon />
                     </button>
                   </div>
-                  <div className="absolute top-0 left-0 z-10 flex justify-start items-start">
+                  <div className="absolute bottom-72 z-10 mt-[565px]">
                     <button
                       className="border w-8 h-8 rounded-4xl flex justify-center items-center bg-white cursor-pointer"
-                      onClick={handleNextBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePrevBtn();
+                      }}
                     >
-                      <RigthIcon />
+                      <Lefticon />
                     </button>
                   </div>
                 </div>
@@ -113,6 +166,31 @@ export const HerosAction = () => {
           })}
         </div>
       </div>
+
+      {trailerKey && (
+        <div
+          className="fixed p-4 inset-0   flex justify-center items-center z-10"
+          onClick={() => setTrailerKey(null)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <iframe
+              width="800"
+              height="450"
+              src={`https://www.youtube.com/embed/${trailerKey}`}
+              title="Trailer"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+            <button
+              onClick={() => setTrailerKey(null)}
+              className="mt-2 w-full bg-gray-500  rounded p-2 text-white "
+            >
+              😎Anhaaral handuulsan yvdald bayrlalaa😎duussan bol haa g****
+              mini🙂‍↕️
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

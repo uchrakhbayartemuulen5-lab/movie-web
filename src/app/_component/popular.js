@@ -1,11 +1,10 @@
+"use client";
 import { useEffect, useState } from "react";
-import { SeeMoreIcon } from "./seemoreicon";
+import { SeeMoreIcon } from "./icon/seemoreicon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 const apilink =
   "https://api.themoviedb.org/3/movie/popular?language=en-US&page=1";
-
 const options = {
   method: "GET",
   headers: {
@@ -23,64 +22,68 @@ export const Popular = () => {
 
   const getData = async () => {
     setLoading(true);
-    const data = await fetch(apilink, options);
-    const jsonData = await data.json();
-    setPopularData(jsonData.results);
+    try {
+      const data = await fetch(apilink, options);
+      const jsonData = await data.json();
+      setPopularData(jsonData.results);
+    } catch (err) {
+      console.error("Error fetching Popular movies:", err);
+    }
     setLoading(false);
   };
-
-  console.log("loading", loading);
-  console.log("popular", popularData);
 
   useEffect(() => {
     getData();
   }, []);
+
+  const handleMovieClick = (movieID) => {
+    router.push(`/movie-detail/${movieID}`);
+  };
+
   if (loading) {
     return <div>...loading</div>;
   }
 
-  const handleMovieClick = () => {
-    router.push("./movie-details/${movieID}");
-  };
-
   return (
     <div>
-      <div className="flex justify-between mb-20 ">
+      <div className="flex justify-between mb-20">
         <h1 className="mt-10 text-3xl">Popular</h1>
         <Link
-          href={"popular"}
-          className="mt-10 text-1xl flex justify-center items-center "
+          href="/popular"
+          className="mt-10 text-1xl flex justify-center items-center"
         >
           See More
           <SeeMoreIcon />
         </Link>
       </div>
 
-      <div
-        className="grid grid-cols-5 gap-15 mb-10 "
-        onClick={handleMovieClick}
-      >
-        {popularData.slice(0, 10).map((movie, index) => {
-          return (
-            <div key={index}>
-              <div>
-                <img
-                  className=" w-60 h-[300px] rounded-lg border "
-                  src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
-                />
-              </div>
-              <div>
-                <button className="border w-60 h-20 bg-gray-200 rounded-lg ">
-                  <div className="flex justify-start ">
-                    <img className="w-4 h-4" src="star (2).png" />
-                    <p className="text-l">6.9|10</p>
-                  </div>
-                  <p className="flex justify-start">{movie.title}</p>
-                </button>
-              </div>
+      <div className="grid grid-cols-5 gap-10 mb-10">
+        {popularData.slice(0, 10).map((movie) => (
+          <div
+            key={movie.id}
+            className="cursor-pointer"
+            onClick={() => handleMovieClick(movie.id)}
+          >
+            <div>
+              <img
+                className="w-60 h-[400px] rounded-lg border"
+                src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+                alt={movie.title}
+              />
             </div>
-          );
-        })}
+            <div>
+              <button className="border w-60 h-20 bg-gray-200 rounded-lg mt-2">
+                <div className="flex justify-start items-center gap-1">
+                  <img className="w-4 h-4" src="star (2).png" alt="star" />
+                  <p className="text-l">
+                    {movie.vote_average?.toFixed(1)} / 10
+                  </p>
+                </div>
+                <p className="text-left">{movie.title}</p>
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

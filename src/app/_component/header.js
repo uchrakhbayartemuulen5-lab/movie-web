@@ -1,14 +1,13 @@
 import { DownIcon } from "./icon/dowIcon";
 import { SearchIcon } from "./icon/searchIcon";
 import { MoonIcon } from "./icon/moonicon";
-
 export const Header = () => {
   return (
     <div className="flex justify-between p-[30px] ">
       <div>
         <img
           className="flex justify-center w-[90px] h-[20px]"
-          src="Logo.png"
+          src="/Logo.png"
         ></img>
       </div>
       <div className="flex justify-between gap-[10px]">
@@ -18,11 +17,11 @@ export const Header = () => {
         </button>
         <div className="flex gap-2 items-center border rounded-lg px-3">
           <SearchIcon />
-          <input className="min-w-[100px] min-h-[10px] border-none " />
+          <input className="min-w-[100px] min-h-[10px] border-none outline-none" />
         </div>
       </div>
       <div>
-        <button className=" min-w-[30px] min-h-[30px] flex justify-center border ">
+        <button className=" min-w-[30px] min-h-[30px] flex justify-center items-center border rounded-2xl ">
           <MoonIcon />
         </button>
       </div>

@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import { SeeMoreIcon } from "./icon/seemoreicon";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-const apilink =
-  "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
+import { useParams, useRouter } from "next/navigation";
+import { Lefticon } from "./icon/lefticon";
+import { RigthIcon } from "./icon/rigthicon";
+
 const options = {
   method: "GET",
   headers: {
@@ -14,8 +15,11 @@ const options = {
   },
 };
 
-export const TopRated = () => {
-  const [toprated, settopratedData] = useState([]);
+export const Coming = () => {
+  const { id } = useParams();
+  const apilink = `https://api.themoviedb.org/3/movie/${id}/similar?language=en-US&page=1`;
+
+  const [coming, setComing] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -25,15 +29,15 @@ export const TopRated = () => {
     try {
       const data = await fetch(apilink, options);
       const jsonData = await data.json();
-      settopratedData(jsonData.results);
+      setComing(jsonData.results);
     } catch (err) {
-      console.error("Error fetching toprated movies:", err);
+      console.error("Error fetching upcoming movies:", err);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    getData();
+    getData(id);
   }, []);
 
   const handleMovieClick = (movieID) => {
@@ -47,9 +51,9 @@ export const TopRated = () => {
   return (
     <div>
       <div className="flex justify-between mb-20">
-        <h1 className="mt-10 text-3xl">TopRated</h1>
+        <h1 className="mt-10 text-3xl">More like this</h1>
         <Link
-          href="/toprated"
+          href={`/seemore/${id}`}
           className="mt-10 text-1xl flex justify-center items-center"
         >
           See More
@@ -58,7 +62,7 @@ export const TopRated = () => {
       </div>
 
       <div className="grid grid-cols-5 gap-10 mb-10">
-        {toprated.slice(0, 10).map((movie) => (
+        {coming.slice(0, 5).map((movie) => (
           <div
             key={movie.id}
             className="cursor-pointer"
@@ -74,7 +78,7 @@ export const TopRated = () => {
             <div>
               <button className="border w-60 h-20 bg-gray-200 rounded-lg mt-2">
                 <div className="flex justify-start items-center gap-1">
-                  <img className="w-4 h-4" src="star (2).png" alt="star" />
+                  <img className="w-4 h-4" src="/star (2).png" alt="star" />
                   <p className="text-l">
                     {movie.vote_average?.toFixed(1)} / 10
                   </p>
