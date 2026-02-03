@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { SeeMoreIcon } from "./icon/seemoreicon";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 const apilink =
   "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1";
+
 const options = {
   method: "GET",
   headers: {
@@ -15,7 +17,7 @@ const options = {
 };
 
 export const TopRated = () => {
-  const [toprated, settopratedData] = useState([]);
+  const [toprated, setTopratedData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -25,11 +27,12 @@ export const TopRated = () => {
     try {
       const data = await fetch(apilink, options);
       const jsonData = await data.json();
-      settopratedData(jsonData.results);
+      setTopratedData(jsonData.results || []);
     } catch (err) {
       console.error("Error fetching toprated movies:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -40,48 +43,56 @@ export const TopRated = () => {
     router.push(`/movie-detail/${movieID}`);
   };
 
-  if (loading) {
-    return <div>...loading</div>;
-  }
+  if (loading) return <div>...loading</div>;
 
   return (
-    <div>
-      <div className="flex justify-between mb-20">
-        <h1 className="mt-10 text-3xl">TopRated</h1>
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
+        <h1 className="mt-6 sm:mt-10 text-2xl sm:text-3xl font-semibold">
+          TopRated
+        </h1>
+
         <Link
           href="/toprated"
-          className="mt-10 text-1xl flex justify-center items-center"
+          className="sm:mt-10 text-sm sm:text-base flex items-center gap-2"
         >
           See More
           <SeeMoreIcon />
         </Link>
       </div>
 
-      <div className="grid grid-cols-5 gap-10 mb-10">
+      {/* Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 mb-10">
         {toprated.slice(0, 10).map((movie) => (
           <div
             key={movie.id}
             className="cursor-pointer"
             onClick={() => handleMovieClick(movie.id)}
           >
-            <div>
+            {/* Poster */}
+            <div className="w-full overflow-hidden rounded-lg border bg-black/10">
               <img
-                className="w-60 h-[400px] rounded-lg border"
+                className="w-full h-full object-cover aspect-[2/3]"
                 src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
                 alt={movie.title}
+                loading="lazy"
               />
             </div>
-            <div>
-              <button className="border w-60 h-20 bg-gray-200 rounded-lg mt-2">
-                <div className="flex justify-start items-center gap-1">
-                  <img className="w-4 h-4" src="star (2).png" alt="star" />
-                  <p className="text-l">
-                    {movie.vote_average?.toFixed(1)} / 10
-                  </p>
-                </div>
-                <p className="text-left">{movie.title}</p>
-              </button>
-            </div>
+
+            {/* Info */}
+            <button className="w-full bg-gray-200 rounded-lg mt-2 p-3">
+              <div className="flex items-center gap-2">
+                <img className="w-4 h-4" src="star (2).png" alt="star" />
+                <p className="text-sm sm:text-base">
+                  {movie.vote_average?.toFixed(1)} / 10
+                </p>
+              </div>
+
+              <p className="mt-1 text-left text-sm sm:text-base font-medium line-clamp-2">
+                {movie.title}
+              </p>
+            </button>
           </div>
         ))}
       </div>

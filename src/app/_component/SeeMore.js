@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { SeeMoreIcon } from "./icon/seemoreicon";
 import { useParams, useRouter } from "next/navigation";
+import { Lefticon } from "@/app/_component/icon/lefticon";
+import { RigthIcon } from "@/app/_component/icon/rigthicon";
+import Link from "next/link";
 
 const options = {
   method: "GET",
@@ -12,13 +14,13 @@ const options = {
   },
 };
 
-export const Coming = () => {
+export const SeeMore = () => {
   const { id } = useParams();
   const router = useRouter();
 
   const apilink = `https://api.themoviedb.org/3/movie/${id}/similar?language=en-US&page=1`;
 
-  const [coming, setComing] = useState([]);
+  const [seeMore, setSeeMore] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const getData = async () => {
@@ -27,9 +29,9 @@ export const Coming = () => {
     try {
       const data = await fetch(apilink, options);
       const jsonData = await data.json();
-      setComing(jsonData.results || []);
+      setSeeMore(jsonData.results || []);
     } catch (err) {
-      console.error("Error fetching similar movies:", err);
+      console.error("Error fetching seeMore movies:", err);
     } finally {
       setLoading(false);
     }
@@ -49,23 +51,23 @@ export const Coming = () => {
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-12">
         <h1 className="mt-6 sm:mt-10 text-2xl sm:text-3xl font-semibold">
           More like this
         </h1>
 
-        <button
-          onClick={() => router.push(`/SeeMore/${id}`)}
-          className="sm:mt-10 text-sm sm:text-base flex items-center gap-2 hover:underline w-fit"
+        {/* Буцах линк (хүсвэл) */}
+        <Link
+          href={`/movie-detail/${id}`}
+          className="w-fit text-sm sm:text-base hover:underline"
         >
-          See More
-          <SeeMoreIcon />
-        </button>
+          Back
+        </Link>
       </div>
 
-      {/* Grid */}
+      {/* Grid responsive */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 mb-10">
-        {coming.slice(0, 5).map((movie) => (
+        {seeMore.map((movie) => (
           <div
             key={movie.id}
             className="cursor-pointer"
@@ -82,7 +84,7 @@ export const Coming = () => {
             </div>
 
             {/* Info */}
-            <button className="w-full bg-gray-200 rounded-lg mt-2 p-3">
+            <div className="w-full bg-gray-200 rounded-lg mt-2 p-3">
               <div className="flex items-center gap-2">
                 <img className="w-4 h-4" src="/star (2).png" alt="star" />
                 <p className="text-sm sm:text-base">
@@ -93,9 +95,38 @@ export const Coming = () => {
               <p className="mt-1 text-left text-sm sm:text-base font-medium line-clamp-2">
                 {movie.title}
               </p>
-            </button>
+            </div>
           </div>
         ))}
+      </div>
+
+      <div className="flex justify-center sm:justify-end">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <button className="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-100">
+            <Lefticon />
+            <span className="hidden sm:inline opacity-60">previous</span>
+          </button>
+
+          {[1, 2, 3, 4].map((n) => (
+            <button
+              key={n}
+              className="w-8 h-8 border rounded-lg flex items-center justify-center hover:bg-gray-50"
+            >
+              {n}
+            </button>
+          ))}
+
+          <span className="px-1 opacity-60">…</span>
+
+          <button className="w-8 h-8 border rounded-lg flex items-center justify-center hover:bg-gray-50">
+            5
+          </button>
+
+          <button className="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-100">
+            <span className="hidden sm:inline opacity-60">next</span>
+            <RigthIcon />
+          </button>
+        </div>
       </div>
     </div>
   );
