@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Header } from "../_component/Header";
 import { Blue } from "../_component/Blue";
 import { StarIcon } from "../_component/icon/phone";
@@ -15,7 +15,15 @@ const options = {
   },
 };
 
-export default function SearchPage() {
+export default function SearchPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPage />
+    </Suspense>
+  );
+}
+
+function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
   const router = useRouter();

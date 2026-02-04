@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Header } from "../_component/Header";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +13,15 @@ const options = {
   },
 };
 
-export default function GenreMovies() {
+export default function GenreMoviesPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GenreMovies />
+    </Suspense>
+  );
+}
+
+function GenreMovies() {
   const searchParams = useSearchParams();
   const genreId = searchParams.get("genre");
   const router = useRouter();
